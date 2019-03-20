@@ -11,7 +11,7 @@ class ComputerVision(ConanFile):
     exports_sources = "*"
     requires =  ("Catch2/2.7.0@catchorg/stable",
                  "spdlog/1.3.1@bincrafters/stable",
-                 "opencv/4.0.1@conan/stable")
+                 "jsonformoderncpp/3.6.0@vthiery/stable")
 
     def build(self):
         cmake = CMake(self)
