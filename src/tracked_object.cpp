@@ -1,39 +1,40 @@
 #include <tracked_object.h>
 
 TrackedObject::TrackedObject(const cv::_InputArray& frame, cv::Rect bounding_box)
-        : tracker(cv::TrackerKCF::create()),
-          bounding_box(bounding_box),
+        : bounding_box(bounding_box),
           previous_box(bounding_box) {
     std::cout << "constructing a tracked object" << std::endl;
-
-    tracker->init(frame, bounding_box);
 }
 
-void TrackedObject::update(cv::InputArray frame) {
-    std::cout << "Update: " << this->bounding_box << std::endl;
+void TrackedObject::update(cv::Rect bounding_box) {
     this->previous_box = this->bounding_box;
+    this->bounding_box = bounding_box;
+    this->missed_frames = 0;
+}
 
-    if (!this->tracker->update(frame, this->bounding_box)) {
-        this->missed_frames++;
-    }
+void TrackedObject::tick() {
+    std::cout << this->missed_frames << std::endl;
+    this->missed_frames++;
 }
 
 bool TrackedObject::is_stale() const {
-    bool stale = this->missed_frames > 10;
-    std::cout << "stale " << stale << std::endl;
-    return stale;
+    return this->missed_frames > 5;
 }
 
-double TrackedObject::distance_from(cv::Rect other) {
+double TrackedObject::distance_from(cv::Rect other) const {
     cv::Point a = (this->bounding_box.br() + this->bounding_box.tl()) * 0.5;
     cv::Point b = (other.br() + other.tl()) * 0.5;
     double distance = cv::norm(a - b);
-    std::cout << distance << std::endl;
+
     return distance;
 }
 
-double TrackedObject::speed(int pixels_per_foot) {
-    return 0;
+double TrackedObject::speed(double pixels_per_foot, int fps) const {
+    double pixels_traveled = this->distance_from(this->previous_box);
+    double miles_traveled = (pixels_traveled / pixels_per_foot)/ 5280.0;
+    double hours = (1.0 / fps) / 3600;
+
+    return miles_traveled / hours;
 }
 
 

@@ -15,11 +15,13 @@ public:
 
     TrackedObject(cv::InputArray frame, cv::Rect bounding_box);
 
-    void update(cv::InputArray frame);
+    void update(cv::Rect bounding_box);
+
+    void tick();
 
     bool is_stale() const;
 
-    double distance_from(cv::Rect other);
+    double distance_from(cv::Rect other) const;
 
-    double speed(int pixels_per_foot);
+    double speed(double pixels_per_foot, int fps) const;
 };

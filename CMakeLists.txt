@@ -42,9 +42,9 @@ find_package(OpenCV REQUIRED)
 
 # Executable
 set(EXE_HEADERS
-        include/tracked_object.h)
+        include/tracked_object.h include/recorder.h)
 set(EXE_SOURCES
-        src/tracked_object.cpp)
+        src/tracked_object.cpp src/recorder.cpp)
 
 add_executable(computer_vision src/main.cpp ${EXE_HEADERS} ${EXE_SOURCES})
 target_include_directories(computer_vision PRIVATE include)
