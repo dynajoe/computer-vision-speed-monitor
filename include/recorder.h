@@ -7,7 +7,7 @@ private:
     bool is_recording;
     cv::VideoWriter writer;
 public:
-    void record();
+    void record(int fps);
 
     void stop();
 

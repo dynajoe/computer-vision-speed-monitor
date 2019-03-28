@@ -21,7 +21,7 @@ int main(int argc, char** argv) {
 
 
 void processImages(const char* filename) {
-    cv::VideoCapture capture("http://192.168.1.142/videostream.cgi?user=admin&pwd=&type=.mjpg");
+    cv::VideoCapture capture("http://192.168.1.142/videostream.cgi?user=development&pwd=development&type=.mjpg");
     //cv::VideoCapture capture(0);
     //cv::VideoCapture capture(filename);
 
@@ -52,7 +52,10 @@ void processImages(const char* filename) {
     int frame_count = 0;
 
     while ((char) keyboard != 'q') {
-        std::cout << "Frame: " << frame_count++ << std::endl;
+        int fps = capture.get(cv::CAP_PROP_FPS);
+        int position = capture.get(cv::CAP_PROP_POS_MSEC);
+
+        std::cout << "Frame: " << frame_count++ << " FPS: " << fps << " Position: " << position << std::endl;
         cv::Mat threshold_image;
         cv::Mat markup_frame;
 
@@ -61,7 +64,6 @@ void processImages(const char* filename) {
             capture.read(current_frame);
             break;
         }
-
 
         current_frame.copyTo(markup_frame);
 
@@ -127,7 +129,7 @@ void processImages(const char* filename) {
         std::for_each(trackers.begin(), trackers.end(), [&](TrackedObject& t) {
             t.tick();
 
-            std::string speed = fmt::format("{:.0f} mph", t.speed(12.24, 10));
+            std::string speed = fmt::format("{:.0f} mph", t.speed(12.24, fps));
 
             cv::putText(markup_frame,
                         speed,
@@ -146,7 +148,7 @@ void processImages(const char* filename) {
                     trackers.end(),
                     [](TrackedObject& t) { return t.is_stale(); }), trackers.end());
             if (!recorder.recording()) {
-                recorder.record();
+                recorder.record(fps);
             }
 
             recorder.write(current_frame);
@@ -160,8 +162,9 @@ void processImages(const char* filename) {
         imshow("threshold", threshold_image);
 
         current_frame.copyTo(previous_frame);
-        keyboard = cv::waitKey(100);
+        keyboard = cv::waitKey(1);
     }
+
     recorder.stop();
     capture.release();
 }

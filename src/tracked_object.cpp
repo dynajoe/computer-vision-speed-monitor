@@ -13,7 +13,6 @@ void TrackedObject::update(cv::Rect bounding_box) {
 }
 
 void TrackedObject::tick() {
-    std::cout << this->missed_frames << std::endl;
     this->missed_frames++;
 }
 
